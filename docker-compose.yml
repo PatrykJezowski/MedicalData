@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:18.1
+    restart: always
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: super_secret_password
+      POSTGRES_DB: medical_app
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: medicaldata-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:8081
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /app/Backend.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "MojeHaslo123"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=medical_app;Username=app_user;Password=super_secret_password"
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
+
+  frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      container_name: medicaldata-frontend
+      ports:
+      - "3000:3000"
+      depends_on:
+        - backend
+
+volumes:
+  pgdata:
