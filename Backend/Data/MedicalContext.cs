@@ -10,6 +10,6 @@ namespace Backend.Data
         {
         }
 
-        public DbSet<Patient> Patients { get; set; } = null!;
+        public DbSet<User> User { get; set; } = null!;
     }
 }
